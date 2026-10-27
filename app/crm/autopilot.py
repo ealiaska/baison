@@ -245,7 +245,7 @@ def apply_autopilot(lead, create_task=None):
         budget = detect_budget(text)
         if budget:
             lead.budget = budget
-            actions.append(f"бюджет: {budget:,} ₽".replace(",", " "))
+            actions.append(f"бюджет: {budget:,} ₸".replace(",", " "))
     if not lead.deadline:
         deadline = detect_deadline(text)
         if deadline:

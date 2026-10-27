@@ -42,9 +42,9 @@ def create_app(config_object="app.config.Config"):
     @app.template_filter("fmoney")
     def fmt_money(value):
         try:
-            return f"{float(value or 0):,.0f} ₽"
+            return f"{float(value or 0):,.0f}".replace(",", " ") + " ₸"
         except (TypeError, ValueError):
-            return "0 ₽"
+            return "0 ₸"
 
     @app.context_processor
     def inject_user():

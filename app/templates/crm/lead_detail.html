@@ -37,9 +37,9 @@
           {% for u in users %}<option value="{{ u.id }}" {{ 'selected' if lead.assigned_to == u.id }}>{{ u.full_name or u.username }}</option>{% endfor %}
         </select>
       </div>
-      <div><label>Сумма, ₽</label><input name="deal_amount" type="number" step="1" value="{{ lead.deal_amount or 0 }}"></div>
+      <div><label>Сумма, ₸</label><input name="deal_amount" type="number" step="1" value="{{ lead.deal_amount or 0 }}"></div>
       <div class="span-3"><label>Что ищет (квалификация)</label><input name="need" value="{{ lead.need }}" placeholder="Котёл 24 кВт + монтаж"></div>
-      <div><label>Бюджет, ₽</label><input name="budget" type="number" step="1000" value="{{ lead.budget or 0 }}"></div>
+      <div><label>Бюджет, ₸</label><input name="budget" type="number" step="1000" value="{{ lead.budget or 0 }}"></div>
       <div><label>Сроки</label>
         <select name="deadline">
           <option value="">— не уточнено —</option>

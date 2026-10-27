@@ -59,9 +59,9 @@ _registered = False
 
 def money(value) -> str:
     try:
-        return f"{float(value or 0):,.0f}".replace(",", " ") + " ₽"
+        return f"{float(value or 0):,.0f}".replace(",", " ") + " ₸"
     except (TypeError, ValueError):
-        return "0 ₽"
+        return "0 ₸"
 
 
 def build_invoice_pdf(inv) -> bytes:

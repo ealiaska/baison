@@ -26,7 +26,7 @@
   </div>
   <div class="card">
     <table class="items-table">
-      <tr><th style="width:32%">Товар</th><th>Название (ручное/услуга)</th><th style="width:11%">Кол-во</th><th style="width:14%">Цена, ₽</th><th style="width:14%">Скидка/шт, ₽</th><th></th></tr>
+      <tr><th style="width:32%">Товар</th><th>Название (ручное/услуга)</th><th style="width:11%">Кол-во</th><th style="width:14%">Цена, ₸</th><th style="width:14%">Скидка/шт, ₸</th><th></th></tr>
       {% for i in range(6) %}
       <tr>
         <td>
@@ -41,7 +41,7 @@
         <td><input name="qty" type="number" step="0.01" value="1"></td>
         <td><input name="price" type="number" step="0.01" value="0"></td>
         <td><input name="discount" type="number" step="0.01" value="0"></td>
-        <td><span class="item-total muted">0 ₽</span></td>
+        <td><span class="item-total muted">0 ₸</span></td>
       </tr>
       {% endfor %}
     </table>

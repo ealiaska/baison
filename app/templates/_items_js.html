@@ -14,7 +14,7 @@ document.querySelectorAll('.item-product').forEach(function (sel) {
     function update() {
       var p = parseFloat(price && price.value) || 0;
       var q = parseFloat(qty && qty.value) || 0;
-      if (total) total.textContent = (p * q).toLocaleString('ru-RU') + ' ₽';
+      if (total) total.textContent = (p * q).toLocaleString('ru-RU') + ' ₸';
     }
     price.addEventListener('input', update);
     qty.addEventListener('input', update);

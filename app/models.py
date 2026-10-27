@@ -159,7 +159,7 @@ class Lead(db.Model):
     comment = Column(Text, default="")
     # квалификация
     need = Column(String(256), default="")          # что ищет
-    budget = Column(Numeric(12, 2), default=0)      # бюджет, ₽
+    budget = Column(Numeric(12, 2), default=0)      # бюджет, ₸
     deadline = Column(String(32), default="")       # asap/month/planning
     decider = Column(String(32), default="")        # self/family/company
     autofill = Column(Text, default="")             # что заполнил автопилот
