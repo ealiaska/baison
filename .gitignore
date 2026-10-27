@@ -15,6 +15,10 @@ instance/
 
 # Временные файлы
 bg_out.txt
+w_out.txt
+w_err.txt
+gunicorn_out.txt
+logs/
 *.log
 
 # IDE / ОС
