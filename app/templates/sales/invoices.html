@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Счета — baisón{% endblock %}
+{% block content %}
+<div class="row">
+  <h1 style="margin:0">Счета</h1>
+  <div class="spacer"></div>
+  <a class="btn" href="{{ url_for('sales.invoice_new') }}">+ Новый счёт</a>
+</div>
+<div class="toolbar" style="margin-top:14px">
+  <form method="get" class="row">
+    <select name="status" onchange="this.form.submit()">
+      <option value="">Все</option>
+      {% for k, v in statuses.items() %}
+      <option value="{{ k }}" {{ 'selected' if status == k }}>{{ v }}</option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+<table>
+  <tr><th>№</th><th>Дата</th><th>Клиент</th><th>Статус</th><th>Действителен до</th><th class="num">Сумма</th></tr>
+  {% for inv in invoices %}
+  <tr>
+    <td><a href="{{ url_for('sales.invoice_detail', invoice_id=inv.id) }}">{{ inv.number }}</a></td>
+    <td>{{ inv.created_at.strftime('%d.%m.%Y') }}</td>
+    <td>{{ inv.client.name if inv.client else '—' }}</td>
+    <td><span class="badge {{ inv.status }}">{{ inv.status_name }}</span></td>
+    <td>{{ inv.valid_until.strftime('%d.%m.%Y') if inv.valid_until else '—' }}</td>
+    <td class="num">{{ inv.total|fmoney }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6" class="muted">Счетов нет</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

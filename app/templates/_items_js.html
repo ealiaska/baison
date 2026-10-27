@@ -1,0 +1,24 @@
+<script>
+document.querySelectorAll('.item-product').forEach(function (sel) {
+  sel.addEventListener('change', function () {
+    var opt = sel.selectedOptions[0];
+    var tr = sel.closest('tr');
+    var name = tr.querySelector('input[name=product_name]');
+    var price = tr.querySelector('input[name=price]');
+    var qty = tr.querySelector('input[name=qty]');
+    var total = tr.querySelector('.item-total');
+    if (opt && opt.value) {
+      if (name) name.value = opt.dataset.name || '';
+      if (price && opt.dataset.price) price.value = opt.dataset.price;
+    }
+    function update() {
+      var p = parseFloat(price && price.value) || 0;
+      var q = parseFloat(qty && qty.value) || 0;
+      if (total) total.textContent = (p * q).toLocaleString('ru-RU') + ' ₽';
+    }
+    price.addEventListener('input', update);
+    qty.addEventListener('input', update);
+    update();
+  });
+});
+</script>

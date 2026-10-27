@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Остатки — baisón{% endblock %}
+{% block content %}
+<h1>Остатки</h1>
+<div class="toolbar">
+  <form method="get" class="row">
+    <select name="storage" onchange="this.form.submit()">
+      <option value="">Все склады</option>
+      {% for s in storages %}
+      <option value="{{ s.id }}" {{ 'selected' if storage_id == s.id }}>{{ s.name }}</option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+<table>
+  <tr><th>Артикул</th><th>Товар</th><th>Склад</th><th class="num">Кол-во</th></tr>
+  {% for stock, product, storage in rows %}
+  <tr>
+    <td><a href="{{ url_for('catalog.product_detail', product_id=product.id) }}">{{ product.sku }}</a></td>
+    <td>{{ product.name }}</td>
+    <td>{{ storage.name }}</td>
+    <td class="num">{{ stock.qty }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="4" class="muted">Остатков нет — проведите приход</td></tr>
+  {% endfor %}
+</table>
+
+<h2>Движение товара</h2>
+<div class="grid" style="grid-template-columns: 1fr 360px; align-items: start;">
+  <div class="card">
+    <form method="post" action="{{ url_for('catalog.movement_add') }}" class="form-grid">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div><label>Склад</label>
+        <select name="storage_id">
+          {% for s in storages %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="span-2"><label>Товар</label>
+        <select name="product_id">
+          <option value="">— выбрать —</option>
+          {% for p in products %}<option value="{{ p.id }}">{{ p.sku }} — {{ p.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div><label>Операция</label>
+        <select name="kind">
+          <option value="in">Приход</option>
+          <option value="out">Списание</option>
+          <option value="correction">Корректировка</option>
+        </select>
+      </div>
+      <div><label>Кол-во</label><input name="qty" type="number" required></div>
+      <div class="span-3"><label>Комментарий</label><input name="comment" placeholder="Накладная №..."></div>
+      <div class="row span-3" style="justify-content: flex-end"><button>Провести</button></div>
+    </form>
+  </div>
+  <div class="card">
+    <h2 style="margin-top:0">Новый склад</h2>
+    <form method="post" action="{{ url_for('catalog.storage_add') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Название</label><input name="name" required>
+      <label>Тип</label>
+      <select name="type">
+        <option value="склад">склад</option>
+        <option value="магазин">магазин</option>
+        <option value="точка выдачи">точка выдачи</option>
+      </select>
+      <label>Адрес</label><input name="address">
+      <br><br>
+      <button>Добавить</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Главная — baisón{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 style="margin-bottom:2px">Главная</h1>
+    <div class="muted" style="margin-top:0">{{ today }}</div>
+  </div>
+  <div class="spacer"></div>
+  <a class="btn" href="{{ url_for('crm.leads') }}">+ Новая заявка</a>
+</div>
+
+<div class="grid grid-4">
+  <div class="card stat"><div class="label">Открытые заявки</div><div class="value">{{ leads_open }}</div><div class="hint">в работе</div></div>
+  <div class="card stat"><div class="label">Сделок закрыто</div><div class="value">{{ leads_won }}</div><div class="hint">сделано</div></div>
+  <div class="card stat"><div class="label">Задач в работе</div><div class="value">{{ tasks_open }}</div><div class="hint">открыто</div></div>
+  <div class="card stat"><div class="label">Активных заказов</div><div class="value">{{ orders_open }}</div><div class="hint">не отгружены</div></div>
+</div>
+
+<h2>Последние заявки</h2>
+<table>
+  <tr><th>Дата</th><th>Клиент</th><th>Источник</th><th>Этап</th><th class="num">Сумма</th></tr>
+  {% for lead in recent_leads %}
+  <tr>
+    <td>{{ lead.updated_at.strftime('%d.%m.%Y %H:%M') }}</td>
+    <td><a href="{{ url_for('crm.lead_detail', lead_id=lead.id) }}">{{ lead.client.name if lead.client else '—' }}</a></td>
+    <td>{{ lead.source }}</td>
+    <td><span class="badge {{ lead.status }}">{{ lead.status_name() }}</span></td>
+    <td class="num">{{ lead.deal_amount|fmoney }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="5" class="empty">Заявок пока нет</td></tr>
+  {% endfor %}
+</table>
+
+{% if low_stock %}
+<h2>Мало на складе</h2>
+<table>
+  <tr><th>Артикул</th><th>Товар</th></tr>
+  {% for name, sku in low_stock %}
+  <tr><td>{{ sku }}</td><td>{{ name }}</td></tr>
+  {% endfor %}
+</table>
+{% endif %}
+{% endblock %}

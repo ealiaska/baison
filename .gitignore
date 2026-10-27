@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Локальная конфигурация (секреты)
+.env
+
+# Локальная база SQLite (продакшен — PostgreSQL)
+instance/
+*.db
+
+# Временные файлы
+bg_out.txt
+*.log
+
+# IDE / ОС
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

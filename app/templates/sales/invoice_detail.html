@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ inv.number }} — baisón{% endblock %}
+{% block content %}
+<div class="row">
+  <h1 style="margin:0">Счёт {{ inv.number }}</h1>
+  <span class="badge {{ inv.status }}">{{ inv.status_name }}</span>
+  <div class="spacer"></div>
+  <form method="post" action="{{ url_for('sales.invoice_status', invoice_id=inv.id) }}" class="row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <select name="status" style="width:auto">
+      {% for k, v in statuses.items() %}
+      <option value="{{ k }}" {{ 'selected' if inv.status == k }}>{{ v }}</option>
+      {% endfor %}
+    </select>
+    <button class="small">Сменить</button>
+  </form>
+  {% if inv.status in ('draft','sent') %}
+  <form method="post" action="{{ url_for('sales.invoice_to_order', invoice_id=inv.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="small secondary">→ В заказ</button>
+  </form>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="muted">
+    Клиент: <b>{{ inv.client.name if inv.client else '—' }}</b>
+    {% if inv.client and inv.client.phone %} · {{ inv.client.phone }}{% endif %}
+    · Действителен до {{ inv.valid_until.strftime('%d.%m.%Y') if inv.valid_until else '—' }}
+    {% if inv.comment %} · {{ inv.comment }}{% endif %}
+  </div>
+  <table style="margin-top:12px">
+    <tr><th>Артикул</th><th>Наименование</th><th class="num">Кол-во</th><th class="num">Цена</th><th class="num">Сумма</th></tr>
+    {% for item in inv.items %}
+    <tr>
+      <td>{{ item.product.sku if item.product else '—' }}</td>
+      <td>{{ item.product_name or (item.product.name if item.product else '—') }}</td>
+      <td class="num">{{ item.qty }}</td>
+      <td class="num">{{ item.price|fmoney }}</td>
+      <td class="num">{{ item.total|fmoney }}</td>
+    </tr>
+    {% endfor %}
+    <tr><th colspan="4">Итого</th><th class="num">{{ inv.total|fmoney }}</th></tr>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ order.number }} — baisón{% endblock %}
+{% block content %}
+<div class="row">
+  <h1 style="margin:0">Заказ {{ order.number }}</h1>
+  <span class="badge {{ order.status }}">{{ order.status_name }}</span>
+  <div class="spacer"></div>
+  <form method="post" action="{{ url_for('sales.order_status', order_id=order.id) }}" class="row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <select name="status" style="width:auto">
+      {% for k, v in statuses.items() %}
+      <option value="{{ k }}" {{ 'selected' if order.status == k }}>{{ v }}</option>
+      {% endfor %}
+    </select>
+    <button class="small">Сменить</button>
+  </form>
+</div>
+<p class="muted">Отгрузка списывает остатки со складов автоматически.</p>
+
+<div class="card">
+  <div class="muted">
+    Клиент: <b>{{ order.client.name if order.client else '—' }}</b>
+    {% if order.client and order.client.phone %} · {{ order.client.phone }}{% endif %}
+    · Доставка: {{ order.delivery_date.strftime('%d.%m.%Y') if order.delivery_date else '—' }}
+    {% if order.comment %} · {{ order.comment }}{% endif %}
+  </div>
+  <table style="margin-top:12px">
+    <tr><th>Артикул</th><th>Наименование</th><th class="num">Кол-во</th><th class="num">Цена</th><th class="num">Скидка</th><th class="num">Сумма</th></tr>
+    {% for item in order.items %}
+    <tr>
+      <td>{{ item.product.sku if item.product else '—' }}</td>
+      <td>{{ item.product_name or (item.product.name if item.product else '—') }}</td>
+      <td class="num">{{ item.qty }}</td>
+      <td class="num">{{ item.price|fmoney }}</td>
+      <td class="num">{{ item.discount|fmoney }}</td>
+      <td class="num">{{ item.total|fmoney }}</td>
+    </tr>
+    {% endfor %}
+    <tr><th colspan="5">Итого</th><th class="num">{{ order.total|fmoney }}</th></tr>
+  </table>
+</div>
+{% endblock %}

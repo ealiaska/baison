@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+  <title>Оставьте заявку — baisón</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      background:
+        radial-gradient(1000px 500px at 12% -10%, rgba(194,69,30,.22), transparent 60%),
+        radial-gradient(800px 460px at 112% 112%, rgba(194,69,30,.14), transparent 55%),
+        linear-gradient(160deg, var(--anthracite-900), var(--anthracite-950));
+    }
+    .lead-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .lead-box { background: #fff; padding: 34px 30px 30px; border-radius: var(--radius-lg); width: 430px; max-width: 100%; box-shadow: var(--shadow-lg); }
+    .lead-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .lead-brand img { width: 26px; height: auto; }
+    .lead-brand .nm { font-size: 18px; font-weight: 800; color: var(--anthracite-800); letter-spacing: -.01em; }
+    .lead-box h1 { font-size: 21px; font-weight: 800; text-align: center; margin: 18px 0 6px; color: var(--anthracite-800); }
+    .lead-box .sub { text-align: center; color: var(--ink-500); margin: 0 0 18px; font-size: 14px; }
+    .src-chip { display: inline-block; margin-top: 14px; padding: 3px 12px; border-radius: 999px; background: var(--tizian-50); color: var(--tizian-700); font-size: 12px; font-weight: 600; border: 1px solid var(--tizian-100); }
+  </style>
+</head>
+<body>
+<div class="lead-wrap">
+  <div class="lead-box">
+    <div class="lead-brand">
+      <img src="{{ url_for('static', filename='logo-dark.png') }}" alt="baisón">
+      <span class="nm">baisón</span>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+    {% endwith %}
+    <h1>Оставьте заявку</h1>
+    <p class="sub">Отопление и водоснабжение под ключ.<br>Посчитаем и перезвоним.</p>
+    <form method="post" action="{{ url_for('public.lead_form', source=source) }}">
+      <input type="hidden" name="source" value="{{ source }}">
+      <label>Ваше имя</label>
+      <input name="name" required placeholder="Иван">
+      <label>Телефон</label>
+      <input name="phone" required placeholder="+7 999 000-00-00" inputmode="tel">
+      <label>Что ищете?</label>
+      <textarea name="need" rows="2" placeholder="Котёл 24 кВт, трубы, котельная..."></textarea>
+      <label>Комментарий</label>
+      <input name="comment" placeholder="Удобное время звонка">
+      <br><br>
+      <button style="width:100%">Отправить заявку</button>
+      <p class="muted" style="text-align:center; margin-top:12px">Нажимая кнопку, вы соглашаетесь на обработку данных</p>
+    </form>
+    <div style="text-align:center"><span class="src-chip">Заявка из: {{ source }}</span></div>
+  </div>
+</div>
+</body>
+</html>

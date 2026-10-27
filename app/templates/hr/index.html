@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Команда — baisón{% endblock %}
+{% block content %}
+<h1>Команда и явка</h1>
+
+<h2>Сегодня, {{ today.strftime('%d.%m.%Y') }}</h2>
+<table>
+  <tr><th>Сотрудник</th><th>Должность</th><th>Смена</th><th>Приход</th><th>Уход</th><th>Статус</th><th></th></tr>
+  {% for row in today_rows %}
+  <tr>
+    <td><b>{{ row.emp.name }}</b></td>
+    <td>{{ row.emp.position }}</td>
+    <td>{{ row.emp.shift_start }}–{{ row.emp.shift_end }}</td>
+    <td>{{ row.arrived or '—' }}</td>
+    <td>{{ row.left or '—' }}</td>
+    <td>
+      {% if row.finished %}<span class="badge done">отработал</span>
+      {% elif row.state == 'late' %}<span class="badge lost">опоздал</span>
+      {% elif row.state == 'on_time' %}<span class="badge won">вовремя</span>
+      {% else %}<span class="badge draft">ожидается</span>{% endif %}
+    </td>
+    <td>
+      {% if not row.arrived %}
+      <form method="post" action="{{ url_for('hr.punch_in', employee_id=row.emp.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="small">Пришёл</button>
+      </form>
+      {% elif not row.finished %}
+      <form method="post" action="{{ url_for('hr.punch_out', employee_id=row.emp.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="small secondary">Ушёл</button>
+      </form>
+      {% else %}<span class="muted">—</span>{% endif %}
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="7" class="muted">Сотрудников нет — добавьте ниже</td></tr>
+  {% endfor %}
+</table>
+
+<div class="grid" style="grid-template-columns: 1fr 340px; align-items: start;">
+  <div>
+    <h2>Отчёт за 7 дней</h2>
+    <table>
+      <tr>
+        <th>Сотрудник</th>
+        {% for d in days %}<th>{{ d.strftime('%d.%m') }}<br><span class="muted">{{ ['пн','вт','ср','чт','пт','сб','вс'][d.weekday()] }}</span></th>{% endfor %}
+        <th class="num">Опозд.</th>
+        <th class="num">Отсутств.</th>
+      </tr>
+      {% for row in report_rows %}
+      <tr>
+        <td><b>{{ row.emp.name }}</b></td>
+        {% for d, mark in row.cells %}
+        <td>
+          {% if mark == 'O' %}<span class="badge won">✓</span>
+          {% elif mark == 'L' %}<span class="badge lost">L</span>
+          {% elif mark == 'A' %}<span class="badge lost">—</span>
+          {% else %}<span class="muted">·</span>{% endif %}
+        </td>
+        {% endfor %}
+        <td class="num">{{ row.late }}</td>
+        <td class="num">{{ row.absent }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="{{ days|length + 3 }}" class="muted">Нет данных</td></tr>
+      {% endfor %}
+    </table>
+    <p class="muted">✓ — вовремя · L — опоздание (после допуска 15 мин) · — — отсутствует в рабочий день · · — выходной/данные за сегодня</p>
+  </div>
+  <div class="card">
+    <h2 style="margin-top:0">Новый сотрудник</h2>
+    <form method="post" action="{{ url_for('hr.employee_add') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Имя *</label><input name="name" required>
+      <label>Должность</label><input name="position" placeholder="монтажник, менеджер...">
+      <label>Начало смены</label><input name="shift_start" value="09:00" placeholder="HH:MM">
+      <label>Конец смены</label><input name="shift_end" value="18:00" placeholder="HH:MM">
+      <label>Рабочие дни (Пн..Вс, 1/0)</label><input name="work_days" value="1111110">
+      <label>Телефон</label><input name="phone">
+      <br><br>
+      <button>Добавить</button>
+    </form>
+    <h2>Список</h2>
+    <table>
+      <tr><th>Имя</th><th>Смена</th><th></th></tr>
+      {% for emp in employees %}
+      <tr>
+        <td>{{ emp.name }} <span class="muted">{{ emp.position }}</span>
+          {% if not emp.is_active %}<span class="badge lost">отключён</span>{% endif %}</td>
+        <td>{{ emp.shift_start }}–{{ emp.shift_end }}</td>
+        <td>
+          <form method="post" action="{{ url_for('hr.employee_toggle', employee_id=emp.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="small secondary">{{ 'Вернуть' if not emp.is_active else 'Уволить' }}</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" class="muted">Пока нет</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}

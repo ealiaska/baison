@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Интеграции — baisón{% endblock %}
+{% block content %}
+<h1>Интеграции</h1>
+<p class="muted">Параметры подключения задаются переменными окружения (см. .env.example). Запуск синхронизации доступен администратору.</p>
+
+<div class="grid grid-4">
+  <div class="card stat">
+    <div class="label">amoCRM</div>
+    <div class="value" style="font-size:16px">{{ 'настроено' if amocrm_configured else 'не настроено' }}</div>
+  </div>
+  <div class="card stat">
+    <div class="label">1С</div>
+    <div class="value" style="font-size:16px">{{ 'настроено' if ones_configured else 'не настроено' }}</div>
+  </div>
+  <div class="card stat"><div class="label">Заявок в системе</div><div class="value">{{ leads_count }}</div></div>
+  <div class="card"></div>
+</div>
+
+<div class="grid" style="grid-template-columns: 1fr 1fr; align-items: start;">
+  <div class="card">
+    <h2 style="margin-top:0">amoCRM</h2>
+    <p class="muted">Вытягивает сделки выбранной воронки и создаёт/обновляет заявки (статус маппится по названию этапа в amoCRM).</p>
+    <form method="post" action="{{ url_for('integrations.run', name='amocrm_leads') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button {{ 'disabled' if not amocrm_configured }}>Вытянуть заявки из amoCRM</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2 style="margin-top:0">1С</h2>
+    <p class="muted">Номенклатура обновляет цены и создаёт отсутствующие товары (по артикулу); остатки пишутся на склад «1С (остатки)».</p>
+    <div class="row">
+      <form method="post" action="{{ url_for('integrations.run', name='ones_products') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button {{ 'disabled' if not ones_configured }}>Номенклатура</button>
+      </form>
+      <form method="post" action="{{ url_for('integrations.run', name='ones_stocks') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button {{ 'disabled' if not ones_configured }}>Остатки</button>
+      </form>
+    </div>
+    <p class="muted" style="margin-top:12px">
+      Ответ 1С (JSON): номенклатура — [{sku, name, price}], остатки — [{sku, qty}].
+      Пути REST-сервиса настраиваются в .env.
+    </p>
+  </div>
+</div>
+{% endblock %}

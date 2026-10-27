@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+  <title>Спасибо! — baisón</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      background:
+        radial-gradient(1000px 500px at 12% -10%, rgba(31,122,77,.18), transparent 60%),
+        linear-gradient(160deg, var(--anthracite-900), var(--anthracite-950));
+    }
+    .lead-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .lead-box { background: #fff; padding: 42px 34px; border-radius: var(--radius-lg); width: 430px; max-width: 100%; text-align: center; box-shadow: var(--shadow-lg); }
+    .check { width: 64px; height: 64px; border-radius: 50%; background: var(--green-100); color: var(--green-700); display: flex; align-items: center; justify-content: center; font-size: 34px; margin: 0 auto 16px; }
+    .lead-box h1 { font-size: 22px; font-weight: 800; margin: 0 0 8px; color: var(--anthracite-800); }
+    .lead-box p { color: var(--ink-500); margin: 0; }
+  </style>
+</head>
+<body>
+<div class="lead-wrap">
+  <div class="lead-box">
+    <div class="check">✓</div>
+    <h1>Заявка принята!</h1>
+    <p>Мы перезвоним в ближайшее время.<br>Номер заявки: <b style="color:var(--tizian-600)">#{{ lead.id }}</b></p>
+    <div style="margin-top:22px; display:flex; align-items:center; justify-content:center; gap:9px; color:var(--ink-400);">
+      <img src="{{ url_for('static', filename='logo-dark.png') }}" alt="baisón" style="width:20px">
+      <span style="font-weight:700; letter-spacing:-.01em">baisón</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

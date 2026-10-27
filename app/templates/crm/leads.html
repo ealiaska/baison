@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Заявки — baisón{% endblock %}
+{% block content %}
+<h1>Заявки</h1>
+
+<div class="card">
+  <form method="post" action="{{ url_for('crm.lead_add') }}" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div><label>Клиент</label>
+      <select name="client_id">
+        <option value="">— новый —</option>
+        {% for c in clients %}<option value="{{ c.id }}">{{ c.name }} {{ c.phone }}</option>{% endfor %}
+      </select>
+    </div>
+    <div><label>Имя (если новый)</label><input name="name" placeholder="Иван"></div>
+    <div><label>Телефон (если новый)</label><input name="phone" placeholder="+7..."></div>
+    <div><label>Источник</label>
+      <select name="source">
+        {% for s in sources %}<option>{{ s }}</option>{% endfor %}
+      </select>
+    </div>
+    <div><label>Менеджер</label>
+      <select name="assigned_to">
+        <option value="">—</option>
+        {% for u in users %}<option value="{{ u.id }}">{{ u.full_name or u.username }}</option>{% endfor %}
+      </select>
+    </div>
+    <div><label>Сумма, ₽</label><input name="deal_amount" type="number" step="1" value="0"></div>
+    <div class="span-3"><label>Комментарий</label><input name="comment" placeholder="Котёл 24 кВт, монтаж..."></div>
+    <div class="row span-3" style="justify-content: flex-end"><button>Создать заявку</button></div>
+  </form>
+</div>
+
+<div class="toolbar">
+  <form method="get" class="row">
+    <select name="status" onchange="this.form.submit()">
+      <option value="">Все этапы</option>
+      {% for k, v in statuses.items() %}
+      <option value="{{ k }}" {{ 'selected' if status == k }}>{{ v }}</option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+
+<table>
+  <tr><th>Обновлена</th><th>Клиент</th><th>Источник</th><th>Менеджер</th><th>Этап</th><th>Темп.</th><th class="num">Сумма</th></tr>
+  {% for lead in leads %}
+  <tr>
+    <td>{{ lead.updated_at.strftime('%d.%m %H:%M') }}</td>
+    <td><a href="{{ url_for('crm.lead_detail', lead_id=lead.id) }}">{{ lead.client.name if lead.client else '—' }}
+      {% if lead.autofill %}<span class="badge autofill" title="{{ lead.autofill }}">⚡</span>{% endif %}
+      {% if lead.client and lead.client.phone %}<span class="muted">{{ lead.client.phone }}</span>{% endif %}</a></td>
+    <td>{{ lead.source }}</td>
+    <td>{{ lead.assignee.full_name if lead.assignee else '—' }}</td>
+    <td><span class="badge {{ lead.status }}">{{ lead.status_name() }}</span></td>
+    <td><span class="badge {{ lead.heat }}">{{ lead.heat_name }}</span></td>
+    <td class="num">{{ lead.deal_amount|fmoney }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="7" class="muted">Заявок нет</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

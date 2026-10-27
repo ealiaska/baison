@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+  <title>{% block title %}baisón{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="{{ url_for('static', filename='logo-white.png') }}" alt="baisón">
+      <div>
+        <span class="brand-name">baisón</span>
+        <span class="brand-sub">Управление</span>
+      </div>
+    </div>
+    <nav>
+      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' }}">ГЛАВНАЯ</a>
+      <div class="nav-group">CRM</div>
+      <a href="{{ url_for('crm.leads') }}" class="{{ 'active' if request.endpoint.startswith('crm.') and 'lead' in request.endpoint }}">Заявки</a>
+      <a href="{{ url_for('crm.tasks') }}" class="{{ 'active' if request.endpoint == 'crm.tasks' }}">Задачи</a>
+      <a href="{{ url_for('crm.clients') }}" class="{{ 'active' if request.endpoint.startswith('crm.') and 'client' in request.endpoint }}">Клиенты</a>
+      <div class="nav-group">Товары</div>
+      <a href="{{ url_for('catalog.products') }}" class="{{ 'active' if request.endpoint.startswith('catalog.') and 'product' in request.endpoint }}">Каталог</a>
+      <a href="{{ url_for('catalog.stocks') }}" class="{{ 'active' if request.endpoint == 'catalog.stocks' }}">Остатки</a>
+      <div class="nav-group">Продажи</div>
+      <a href="{{ url_for('sales.invoices') }}" class="{{ 'active' if request.endpoint.startswith('sales.') and 'invoice' in request.endpoint }}">Счета</a>
+      <a href="{{ url_for('sales.orders') }}" class="{{ 'active' if request.endpoint.startswith('sales.') and 'order' in request.endpoint }}">Заказы</a>
+      {% if user and user.role in ('admin','manager') %}
+      <div class="nav-group">Команда</div>
+      <a href="{{ url_for('hr.index') }}" class="{{ 'active' if request.endpoint.startswith('hr.') }}">Сотрудники и явка</a>
+      {% endif %}
+      {% if user and user.role == 'admin' %}
+      <div class="nav-group">Система</div>
+      <a href="{{ url_for('auth.users') }}" class="{{ 'active' if request.endpoint == 'auth.users' }}">Пользователи</a>
+      <a href="{{ url_for('integrations.index') }}" class="{{ 'active' if request.endpoint.startswith('integrations.') }}">Интеграции</a>
+      {% endif %}
+    </nav>
+    <div class="sidebar-foot">
+      {% if user %}
+        <div class="who">{{ user.full_name or user.username }}</div>
+        <a href="{{ url_for('auth.logout') }}">Выйти из системы</a>
+      {% endif %}
+    </div>
+  </aside>
+  <main class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash {{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Заказы — baisón{% endblock %}
+{% block content %}
+<div class="row">
+  <h1 style="margin:0">Заказы</h1>
+  <div class="spacer"></div>
+  <a class="btn" href="{{ url_for('sales.order_new') }}">+ Новый заказ</a>
+</div>
+<div class="toolbar" style="margin-top:14px">
+  <form method="get" class="row">
+    <select name="status" onchange="this.form.submit()">
+      <option value="">Все</option>
+      {% for k, v in statuses.items() %}
+      <option value="{{ k }}" {{ 'selected' if status == k }}>{{ v }}</option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+<table>
+  <tr><th>№</th><th>Дата</th><th>Клиент</th><th>Доставка</th><th>Статус</th><th class="num">Сумма</th></tr>
+  {% for o in orders %}
+  <tr>
+    <td><a href="{{ url_for('sales.order_detail', order_id=o.id) }}">{{ o.number }}</a></td>
+    <td>{{ o.created_at.strftime('%d.%m.%Y') }}</td>
+    <td>{{ o.client.name if o.client else '—' }}</td>
+    <td>{{ o.delivery_date.strftime('%d.%m.%Y') if o.delivery_date else '—' }}</td>
+    <td><span class="badge {{ o.status }}">{{ o.status_name }}</span></td>
+    <td class="num">{{ o.total|fmoney }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6" class="muted">Заказов нет</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

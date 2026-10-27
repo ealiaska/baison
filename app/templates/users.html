@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Пользователи — baisón{% endblock %}
+{% block content %}
+<h1>Пользователи</h1>
+<div class="grid" style="grid-template-columns: 1fr 320px; align-items: start;">
+  <table>
+    <tr><th>Логин</th><th>Имя</th><th>Роль</th><th>Статус</th><th></th></tr>
+    {% for u in users %}
+    <tr>
+      <td>{{ u.username }}</td>
+      <td>{{ u.full_name }}</td>
+      <td>
+        <form method="post" action="{{ url_for('auth.user_role', user_id=u.id) }}" class="row">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <select name="role" style="width:auto">
+            {% for r in ['admin','manager','cashier'] %}
+            <option value="{{ r }}" {{ 'selected' if u.role == r }}>{{ r }}</option>
+            {% endfor %}
+          </select>
+          <button class="small secondary">OK</button>
+        </form>
+      </td>
+      <td>{{ 'активен' if u.is_active else 'заблокирован' }}</td>
+      <td>
+        <form method="post" action="{{ url_for('auth.user_toggle', user_id=u.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="small secondary">{{ 'Разблокировать' if not u.is_active else 'Заблокировать' }}</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  <div class="card">
+    <h2 style="margin-top:0">Новый пользователь</h2>
+    <form method="post" action="{{ url_for('auth.user_add') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Логин</label><input name="username" required>
+      <label>Пароль</label><input name="password" required>
+      <label>Имя</label><input name="full_name">
+      <label>Роль</label>
+      <select name="role">
+        <option value="manager">manager</option>
+        <option value="cashier">cashier</option>
+        <option value="admin">admin</option>
+      </select>
+      <br><br>
+      <button>Создать</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

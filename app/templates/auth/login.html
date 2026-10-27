@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+  <title>Вход — baisón</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-box">
+    <div class="login-brand">
+      <img src="{{ url_for('static', filename='logo-dark.png') }}" alt="baisón">
+      <div class="name">baisón</div>
+      <div class="tag">Система управления</div>
+    </div>
+    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Логин</label>
+      <input name="username" autofocus required>
+      <label>Пароль</label>
+      <input name="password" type="password" required>
+      <br><br>
+      <button style="width:100%">Войти</button>
+    </form>
+    <div class="login-foot">Доступ только для сотрудников компании</div>
+  </div>
+</div>
+</body>
+</html>

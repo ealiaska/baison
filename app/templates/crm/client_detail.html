@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}{{ client.name }} — baisón{% endblock %}
+{% block content %}
+<h1>{{ client.name }}
+  {% if not client.is_active %}<span class="badge lost">неактивен</span>{% endif %}
+</h1>
+<div class="grid" style="grid-template-columns: 1fr 380px; align-items: start;">
+  <div>
+    <div class="card">
+      <h2 style="margin-top:0">Клиенты</h2>
+      <table>
+        <tr><th>Дата</th><th>Источник</th><th>Этап</th><th>Температура</th><th class="num">Сумма</th></tr>
+        {% for lead in leads %}
+        <tr>
+          <td>{{ lead.updated_at.strftime('%d.%m.%Y') }}</td>
+          <td><a href="{{ url_for('crm.lead_detail', lead_id=lead.id) }}">{{ lead.source }} (#{{ lead.id }})</a></td>
+          <td><span class="badge {{ lead.status }}">{{ lead.status_name() }}</span></td>
+          <td><span class="badge {{ lead.heat }}">{{ lead.heat_name }}</span></td>
+          <td class="num">{{ lead.deal_amount|fmoney }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="muted">Заявок нет</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0">Заказы</h2>
+      <table>
+        <tr><th>№</th><th>Дата</th><th>Статус</th><th class="num">Сумма</th></tr>
+        {% for o in orders %}
+        <tr>
+          <td><a href="{{ url_for('sales.order_detail', order_id=o.id) }}">{{ o.number }}</a></td>
+          <td>{{ o.created_at.strftime('%d.%m.%Y') }}</td>
+          <td><span class="badge {{ o.status }}">{{ o.status_name }}</span></td>
+          <td class="num">{{ o.total|fmoney }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="muted">Заказов нет</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0">Счета</h2>
+      <table>
+        <tr><th>№</th><th>Дата</th><th>Статус</th><th class="num">Сумма</th></tr>
+        {% for inv in invoices %}
+        <tr>
+          <td><a href="{{ url_for('sales.invoice_detail', invoice_id=inv.id) }}">{{ inv.number }}</a></td>
+          <td>{{ inv.created_at.strftime('%d.%m.%Y') }}</td>
+          <td><span class="badge {{ inv.status }}">{{ inv.status_name }}</span></td>
+          <td class="num">{{ inv.total|fmoney }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="muted">Счетов нет</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% if tasks %}
+    <div class="card">
+      <h2 style="margin-top:0">Открытые задачи</h2>
+      <table>
+        <tr><th>Задача</th><th>Кому</th><th>Когда</th></tr>
+        {% for t in tasks %}
+        <tr>
+          <td>{{ t.title }}</td>
+          <td>{{ t.assignee.full_name if t.assignee else '—' }}</td>
+          <td>{{ t.due_at.strftime('%d.%m %H:%M') if t.due_at else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2 style="margin-top:0">Карточка</h2>
+    <form method="post" action="{{ url_for('crm.client_update', client_id=client.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Имя</label><input name="name" value="{{ client.name }}" required>
+      <label>Телефон</label><input name="phone" value="{{ client.phone }}">
+      <label>Email</label><input name="email" value="{{ client.email }}">
+      <label>Компания</label><input name="company" value="{{ client.company }}">
+      <label>Адрес доставки/монтажа</label><input name="address" value="{{ client.address }}">
+      <label>Заметки</label><textarea name="notes" rows="5">{{ client.notes }}</textarea>
+      <br><br>
+      <button>Сохранить</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

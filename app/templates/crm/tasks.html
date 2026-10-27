@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Задачи — baisón{% endblock %}
+{% block content %}
+<h1>Задачи</h1>
+<div class="toolbar">
+  {% for k in ['open','done','canceled'] %}
+  <a class="btn {{ 'secondary' if status != k else '' }}"
+     href="{{ url_for('crm.tasks', status=k) }}">{{ statuses[k] }}</a>
+  {% endfor %}
+</div>
+<table>
+  <tr><th>Задача</th><th>Тип</th><th>Клиент</th><th>Кому</th><th>Когда</th><th></th></tr>
+  {% for t in tasks %}
+  <tr>
+    <td>{{ t.title }} {% if t.lead %}<a href="{{ url_for('crm.lead_detail', lead_id=t.lead_id) }}" class="muted">#{{ t.lead_id }}</a>{% endif %}</td>
+    <td>{{ t.kind }}</td>
+    <td>{{ t.client.name if t.client else '—' }}</td>
+    <td>{{ t.assignee.full_name if t.assignee else '—' }}</td>
+    <td>{{ t.due_at.strftime('%d.%m %H:%M') if t.due_at else '—' }}</td>
+    <td>
+      {% if t.status == 'open' %}
+      <form method="post" action="{{ url_for('crm.task_action', task_id=t.id, action='done') }}" class="row">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="small">✓</button>
+      </form>
+      {% else %}<span class="badge {{ t.status }}">{{ statuses[t.status] }}</span>{% endif %}
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6" class="muted">Задач нет</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

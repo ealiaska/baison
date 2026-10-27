@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Заявка #{{ lead.id }} — baisón{% endblock %}
+{% block content %}
+{% if lead.autofill %}
+<div class="autofill-note">⚡ Автозаполнено: {{ lead.autofill }}</div>
+{% endif %}
+<div class="row">
+  <h1 style="margin:0">Заявка #{{ lead.id }}</h1>
+  <span class="badge {{ lead.status }}">{{ lead.status_name() }}</span>
+  <span class="badge {{ lead.heat }}">{{ lead.heat_name }}</span>
+  {% if lead.autofill %}<span class="badge autofill" title="{{ lead.autofill }}">⚡ авто</span>{% endif %}
+  <div class="spacer"></div>
+  <form method="post" action="{{ url_for('crm.lead_status', lead_id=lead.id) }}" class="row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <select name="status" style="width:auto">
+      {% for k, v in statuses.items() %}
+      <option value="{{ k }}" {{ 'selected' if lead.status == k }}>{{ v }}</option>
+      {% endfor %}
+    </select>
+    <button class="small">Сменить этап</button>
+  </form>
+</div>
+
+<div class="grid" style="grid-template-columns: 1fr 1fr; align-items: start;">
+  <div class="card">
+    <h2 style="margin-top:0">Параметры</h2>
+    <form method="post" action="{{ url_for('crm.lead_update', lead_id=lead.id) }}" class="form-grid">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div><label>Источник</label>
+        <select name="source">
+          {% for s in sources %}<option {{ 'selected' if lead.source == s }}>{{ s }}</option>{% endfor %}
+        </select>
+      </div>
+      <div><label>Менеджер</label>
+        <select name="assigned_to">
+          <option value="">—</option>
+          {% for u in users %}<option value="{{ u.id }}" {{ 'selected' if lead.assigned_to == u.id }}>{{ u.full_name or u.username }}</option>{% endfor %}
+        </select>
+      </div>
+      <div><label>Сумма, ₽</label><input name="deal_amount" type="number" step="1" value="{{ lead.deal_amount or 0 }}"></div>
+      <div class="span-3"><label>Что ищет (квалификация)</label><input name="need" value="{{ lead.need }}" placeholder="Котёл 24 кВт + монтаж"></div>
+      <div><label>Бюджет, ₽</label><input name="budget" type="number" step="1000" value="{{ lead.budget or 0 }}"></div>
+      <div><label>Сроки</label>
+        <select name="deadline">
+          <option value="">— не уточнено —</option>
+          {% for v, label in deadline_choices %}
+          <option value="{{ v }}" {{ 'selected' if lead.deadline == v }}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div><label>Кто решает</label>
+        <select name="decider">
+          <option value="">— не уточнено —</option>
+          {% for v, label in decider_choices %}
+          <option value="{{ v }}" {{ 'selected' if lead.decider == v }}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="span-3"><label>Комментарий</label><textarea name="comment" rows="3">{{ lead.comment }}</textarea></div>
+      <div class="row span-3" style="justify-content: flex-end"><button>Сохранить</button></div>
+    </form>
+    {% if lead.client %}
+    <hr style="border:none;border-top:1px solid #eef1f5;margin:14px 0">
+    <div><b>{{ lead.client.name }}</b> {% if lead.client.company %}<span class="muted">{{ lead.client.company }}</span>{% endif %}</div>
+    <div class="muted">{{ lead.client.phone }} {% if lead.client.email %}· {{ lead.client.email }}{% endif %}</div>
+    {% if lead.client.address %}<div class="muted">{{ lead.client.address }}</div>{% endif %}
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">Задачи</h2>
+    <form method="post" action="{{ url_for('crm.task_add', lead_id=lead.id) }}" class="form-grid">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="span-2"><label>Название</label><input name="title" placeholder="Позвонить и уточнить..."></div>
+      <div><label>Тип</label>
+        <select name="kind">{% for k in task_kinds %}<option>{{ k }}</option>{% endfor %}</select>
+      </div>
+      <div><label>Когда</label><input name="due_at" type="datetime-local"></div>
+      <div><label>Кому</label>
+        <select name="assigned_to">
+          <option value="">—</option>
+          {% for u in users %}<option value="{{ u.id }}">{{ u.full_name or u.username }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="row" style="justify-content: flex-end"><button class="small">Добавить задачу</button></div>
+    </form>
+    <table style="margin-top:12px">
+      <tr><th>Задача</th><th>Тип</th><th>Кому</th><th>Когда</th><th></th></tr>
+      {% for t in tasks %}
+      <tr>
+        <td>{{ t.title }}</td>
+        <td>{{ t.kind }}</td>
+        <td>{{ t.assignee.full_name if t.assignee else '—' }}</td>
+        <td>{{ t.due_at.strftime('%d.%m %H:%M') if t.due_at else '—' }}</td>
+        <td>
+          {% if t.status == 'open' %}
+          <form method="post" action="{{ url_for('crm.task_action', task_id=t.id, action='done') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="next" value="{{ url_for('crm.lead_detail', lead_id=lead.id) }}">
+            <button class="small">✓</button>
+          </form>
+          {% else %}<span class="badge done">ок</span>{% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="muted">Задач нет</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}
