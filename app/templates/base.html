@@ -9,7 +9,15 @@
 </head>
 <body>
 <div class="layout">
-  <aside class="sidebar">
+  <div class="topbar">
+    <button class="menu-btn" aria-label="Меню"
+            onclick="document.getElementById('sb').classList.toggle('open');document.getElementById('bd').classList.toggle('show')">☰</button>
+    <img src="{{ url_for('static', filename='logo-white.png') }}" alt="">
+    <span class="brand-mini">baisón</span>
+    {% if user %}<span class="tb-user">{{ user.full_name or user.username }}</span>{% endif %}
+  </div>
+  <div class="backdrop" id="bd" onclick="this.classList.remove('show');document.getElementById('sb').classList.remove('open')"></div>
+  <aside class="sidebar" id="sb">
     <div class="brand">
       <img src="{{ url_for('static', filename='logo-white.png') }}" alt="baisón">
       <div>
@@ -29,6 +37,9 @@
       <div class="nav-group">Продажи</div>
       <a href="{{ url_for('sales.invoices') }}" class="{{ 'active' if request.endpoint.startswith('sales.') and 'invoice' in request.endpoint }}">Счета</a>
       <a href="{{ url_for('sales.orders') }}" class="{{ 'active' if request.endpoint.startswith('sales.') and 'order' in request.endpoint }}">Заказы</a>
+      {% if user and user.role in ('admin','manager') %}
+      <a href="{{ url_for('reports.index') }}" class="{{ 'active' if request.endpoint == 'reports.index' }}">Отчёты</a>
+      {% endif %}
       {% if user and user.role in ('admin','manager') %}
       <div class="nav-group">Команда</div>
       <a href="{{ url_for('hr.index') }}" class="{{ 'active' if request.endpoint.startswith('hr.') }}">Сотрудники и явка</a>
@@ -55,6 +66,17 @@
     {% block content %}{% endblock %}
   </main>
 </div>
+<script>
+(function () {
+  var sb = document.getElementById('sb');
+  sb.addEventListener('click', function (e) {
+    if (e.target.closest('a')) {
+      sb.classList.remove('open');
+      document.getElementById('bd').classList.remove('show');
+    }
+  });
+})();
+</script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

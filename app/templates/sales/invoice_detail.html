@@ -5,6 +5,9 @@
   <h1 style="margin:0">Счёт {{ inv.number }}</h1>
   <span class="badge {{ inv.status }}">{{ inv.status_name }}</span>
   <div class="spacer"></div>
+  <a class="btn small secondary" href="{{ url_for('sales.invoice_pdf', invoice_id=inv.id) }}" title="Скачать счёт-оценку в PDF">
+    ⬇ PDF
+  </a>
   <form method="post" action="{{ url_for('sales.invoice_status', invoice_id=inv.id) }}" class="row">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <select name="status" style="width:auto">

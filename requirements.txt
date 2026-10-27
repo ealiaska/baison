@@ -5,4 +5,5 @@ werkzeug>=3.1
 requests>=2.32
 psycopg2-binary>=2.9
 waitress>=3.0   # WSGI-сервер для Windows (на Linux-хостинге можно gunicorn)
+reportlab>=4.0  # PDF-счёт-оценка в фирменных цветах
 pytest>=8.3

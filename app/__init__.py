@@ -28,6 +28,7 @@ def create_app(config_object="app.config.Config"):
     from .integrations.routes import integrations_bp
     from .hr.routes import hr_bp
     from .public.routes import public_bp
+    from .reports.routes import reports_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(crm_bp, url_prefix="/crm")
@@ -36,6 +37,7 @@ def create_app(config_object="app.config.Config"):
     app.register_blueprint(integrations_bp, url_prefix="/integrations")
     app.register_blueprint(hr_bp, url_prefix="/hr")
     app.register_blueprint(public_bp)
+    app.register_blueprint(reports_bp, url_prefix="/reports")
 
     @app.template_filter("fmoney")
     def fmt_money(value):

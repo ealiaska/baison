@@ -1,6 +1,7 @@
+import io
 from datetime import date, timedelta
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, send_file, url_for
 
 from .. import db
 from .. import models as m
@@ -78,6 +79,19 @@ def invoice_detail(invoice_id):
     return render_template(
         "sales/invoice_detail.html", inv=inv,
         statuses=m.INVOICE_STATUS_NAMES,
+    )
+
+
+@sales_bp.route("/invoices/<int:invoice_id>/pdf")
+@login_required
+def invoice_pdf(invoice_id):
+    """Счёт-оценка в PDF (фирменные цвета baisón) — скачать/отправить клиенту."""
+    inv = m.Invoice.query.get_or_404(invoice_id)
+    from . import pdf as _pdf_mod
+    data = _pdf_mod.build_invoice_pdf(inv)
+    return send_file(
+        io.BytesIO(data), mimetype="application/pdf",
+        as_attachment=True, download_name=f"{inv.number}.pdf",
     )
 
 

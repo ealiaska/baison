@@ -17,6 +17,19 @@ def make_invoice(client, **extra):
     return client.post("/sales/invoices/add", data=data)
 
 
+def test_invoice_pdf(client, sample):
+    login(client)
+    r = make_invoice(client, client_id=sample["client"].id,
+                     product_id=sample["product"].id)
+    assert r.status_code == 302
+    inv = m.Invoice.query.first()
+    r = client.get(f"/sales/invoices/{inv.id}/pdf")
+    assert r.status_code == 200
+    assert r.content_type == "application/pdf"
+    assert r.data.startswith(b"%PDF")
+    assert len(r.data) > 1000  # не пустой файл
+
+
 def test_invoice_flow(client, sample):
     login(client)
     r = make_invoice(client, client_id=sample["client"].id,

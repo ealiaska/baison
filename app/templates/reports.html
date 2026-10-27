@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Отчёты — baisón{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Отчёты</h1>
+  <form method="get" class="row">
+    <input type="month" name="month" value="{{ month_value }}" style="width:auto"
+           onchange="this.form.submit()">
+  </form>
+  <div class="spacer"></div>
+  <span class="muted">{{ month_name }}</span>
+</div>
+
+<div class="grid grid-4">
+  <div class="card stat">
+    <div class="label">Выручка (заказы)</div>
+    <div class="value">{{ revenue|fmoney }}</div>
+    <div class="hint">без отменённых</div>
+  </div>
+  <div class="card stat">
+    <div class="label">Заказы</div>
+    <div class="value">{{ orders_count }}</div>
+    <div class="hint">за месяц</div>
+  </div>
+  <div class="card stat">
+    <div class="label">Сделки закрыты</div>
+    <div class="value">{{ won_count }}</div>
+    <div class="hint">из {{ leads_count }} заявок</div>
+  </div>
+  <div class="card stat">
+    <div class="label">Новые заявки</div>
+    <div class="value">{{ leads_count }}</div>
+    <div class="hint">конверсия в сделку:
+      {% if leads_count %}{{ '%.0f'|format(won_count / leads_count * 100) }}%{% else %}—{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-4" style="grid-template-columns: 1fr 1fr; align-items: start;">
+  <div class="card">
+    <h2>Выручка по менеджерам</h2>
+    {% if manager_rows %}
+      {% for name, sum, n in manager_rows %}
+      <div class="bar-row">
+        <span class="bar-label" title="{{ name }}">{{ name }}</span>
+        <div class="bar-track"><div class="bar-fill" style="width: {{ '%.0f'|format(sum / max_m * 100) }}%"></div></div>
+        <span class="bar-val">{{ sum|fmoney }}</span>
+      </div>
+      {% endfor %}
+    {% else %}<div class="empty">Заказов за период нет</div>{% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Выручка по категориям</h2>
+    {% if cat_rows %}
+      {% for name, sum in cat_rows %}
+      <div class="bar-row">
+        <span class="bar-label" title="{{ name }}">{{ name }}</span>
+        <div class="bar-track"><div class="bar-fill" style="width: {{ '%.0f'|format(sum / max_c * 100) }}%"></div></div>
+        <span class="bar-val">{{ sum|fmoney }}</span>
+      </div>
+      {% endfor %}
+    {% else %}<div class="empty">Данных нет</div>{% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Воронка заявок (создано за месяц)</h2>
+    {% for key, label, n in funnel %}
+    <div class="bar-row">
+      <span class="bar-label"><span class="badge {{ key }}">{{ label }}</span></span>
+      <div class="bar-track"><div class="bar-fill" style="width: {{ '%.0f'|format(n / max_l * 100) }}%"></div></div>
+      <span class="bar-val">{{ n }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h2>Заявки по источникам</h2>
+    {% if source_rows %}
+      {% for name, n in source_rows %}
+      <div class="bar-row">
+        <span class="bar-label">{{ name|title }}</span>
+        <div class="bar-track"><div class="bar-fill" style="width: {{ '%.0f'|format(n / max_l * 100) }}%"></div></div>
+        <span class="bar-val">{{ n }}</span>
+      </div>
+      {% endfor %}
+    {% else %}<div class="empty">Новых заявок за период нет</div>{% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <h2>Хиты месяца (позиции заказов)</h2>
+  {% if hit_rows %}
+  <table>
+    <tr><th>Товар / услуга</th><th class="num">Кол-во</th><th class="num">Сумма</th></tr>
+    {% for name, (qty, sum) in hit_rows %}
+    <tr>
+      <td>{{ name }}</td>
+      <td class="num">{{ '%g'|format(qty) }}</td>
+      <td class="num">{{ sum|fmoney }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}<div class="empty">Данных нет</div>{% endif %}
+</div>
+{% endblock %}

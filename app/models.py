@@ -88,6 +88,8 @@ class Product(db.Model):
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     brand = Column(String(64), default="")
     unit = Column(String(16), default="шт")
+    description = Column(Text, default="")
+    image = Column(String(256), default="")  # статика: /static/catalog/<image>
     price = Column(Numeric(12, 2), default=0)
     cost = Column(Numeric(12, 2), default=0)
     min_stock = Column(Integer, default=0)
