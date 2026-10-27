@@ -15,6 +15,19 @@ class Config:
     AUTOPILOT_ENABLED = os.environ.get("AUTOPILOT", "1") != "0"
     AUTOPILOT_CREATE_TASK = os.environ.get("AUTOPILOT_TASK", "1") != "0"
 
+    # Instagram DM webhook (Meta Instagram Messaging API)
+    # developers.facebook.com → ваше приложение → Webhooks → Instagram
+    IG_VERIFY_TOKEN = os.environ.get("IG_VERIFY_TOKEN", "")   # токен проверки Callback URL
+    IG_ACCESS_TOKEN = os.environ.get("IG_ACCESS_TOKEN", "")   # token с instagram_manage_messages
+    IG_USER_ID = os.environ.get("IG_USER_ID", "")             # IG user id бизнес-аккаунта
+    IG_GRAPH_URL = os.environ.get("IG_GRAPH_URL", "https://graph.facebook.com/v23.0")
+    IG_AUTO_REPLY = os.environ.get("IG_AUTO_REPLY", "1") != "0"  # приветственный автоответ новому клиенту
+    IG_REPLY_TEXT = os.environ.get(
+        "IG_REPLY_TEXT",
+        "Здравствуйте! Спасибо за обращение. Напишите, пожалуйста, ваш телефон "
+        "— менеджер свяжется и всё посчитает.",
+    )
+
     # amoCRM (Настройки → Настройки → API)
     AMOCRM_URL = os.environ.get("AMOCRM_URL", "")  # https://company.amocrm.ru
     AMOCRM_KEY = os.environ.get("AMOCRM_KEY", "")

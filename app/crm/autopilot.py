@@ -20,7 +20,9 @@ from .. import models as m
 # ---------------------------------------------------------------- телефон
 
 def normalize_phone(raw):
-    """'8 999 123-45-67' / '+7(999)123-45-67' / '9991234567' → '+79991234567'."""
+    """'8 999 123-45-67' / '+7(999)123-45-67' / '9991234567' → '+79991234567'.
+
+    Строки без цифр (например 'абв') — не телефон, ''."""
     d = re.sub(r"\D", "", raw or "")
     if not d:
         return ""
@@ -215,10 +217,11 @@ def apply_autopilot(lead, create_task=None):
     actions = []
     text = " ".join(filter(None, [(lead.need or ""), (lead.comment or "")]))
 
-    # 1. Телефон клиента: нормализуем на месте
+    # 1. Телефон клиента: нормализуем на месте (только строки, похожие
+    #    на телефон; идентификаторы вида 'ig:123' не трогаем)
     if lead.client_id and not lead.client:
         lead.client = db.session.get(m.Client, lead.client_id)
-    if lead.client and lead.client.phone:
+    if lead.client and lead.client.phone and re.fullmatch(r"[\d+()\-\s]+", lead.client.phone):
         norm = normalize_phone(lead.client.phone)
         if norm and norm != lead.client.phone:
             lead.client.phone = norm
